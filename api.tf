@@ -14,6 +14,8 @@ resource "aws_api_gateway_resource" "bucket_item_resource" {
   rest_api_id = aws_api_gateway_rest_api.simple_apigw.id
 }
 
+#POST METHOD
+
 resource "aws_api_gateway_method" "item_method" {
   rest_api_id   = aws_api_gateway_rest_api.simple_apigw.id
   resource_id   = aws_api_gateway_resource.bucket_item_resource.id
@@ -31,7 +33,7 @@ resource "aws_api_gateway_integration" "item_integration" {
   integration_http_method = "PUT"
   type                    = "AWS"
   credentials             = aws_iam_role.simple_apigw_role.arn
-  uri                     = "arn:aws:apigateway:us-east-1:s3:path/${aws_s3_bucket.simple_apigw_s3.bucket}/bucket/{item}"
+  uri                     = "arn:aws:apigateway:us-east-1:s3:path/${aws_s3_bucket.simple_apigw_s3.bucket}/{item}"
 }
 
 resource "aws_api_gateway_method_response" "item_response_200" {
@@ -56,4 +58,15 @@ resource "aws_api_gateway_integration_response" "item_Integration400" {
   #response_parameters = { "method.response.header.Access-Control-Allow-Origin" = "'*'" }
 }
 
+
+#DELETE METHOD
+resource "aws_api_gateway_method" "item_method_del" {
+  rest_api_id   = aws_api_gateway_rest_api.simple_apigw.id
+  resource_id   = aws_api_gateway_resource.bucket_item_resource.id
+  http_method   = "DELETE"
+  authorization = "NONE"
+  request_parameters = {
+    "method.request.header.Content-Type" = true
+  }
+}
 
