@@ -23,7 +23,7 @@ resource "aws_api_gateway_method" "item_method" {
   authorization = "NONE"
   request_parameters = {
     "method.request.header.Content-Type" = true
-    "method.request.path.item" = true
+    "method.request.path.item"           = true
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_api_gateway_integration" "item_integration" {
   request_parameters = {
     "integration.request.path.item" = "method.request.path.item"
   }
-  
+
 }
 
 resource "aws_api_gateway_method_response" "item_response_200" {
@@ -58,7 +58,7 @@ resource "aws_api_gateway_integration_response" "item_Integration400" {
   http_method = aws_api_gateway_method.item_method.http_method
   status_code = aws_api_gateway_method_response.item_response_200.status_code
   response_templates = {
-    "application/json" = var.integration_error_template
+    "application/json" = var.integration_sucess_template
   }
   #response_parameters = { "method.response.header.Access-Control-Allow-Origin" = "'*'" }
 }
@@ -71,10 +71,20 @@ resource "aws_api_gateway_method" "item_method_del" {
   http_method   = "DELETE"
   authorization = "NONE"
   request_parameters = {
-      "method.request.path.item" = true
-   }
+    "method.request.path.item" = true
+  }
 }
 
+resource "aws_api_gateway_method_response" "item_response_200_del" {
+  rest_api_id = aws_api_gateway_rest_api.simple_apigw.id
+  resource_id = aws_api_gateway_resource.bucket_item_resource.id
+  http_method = aws_api_gateway_method.item_method_del.http_method
+  status_code = "200"
+  response_models = {
+    "application/json" = var.request_model
+  }
+  #response_parameters = { "method.response.header.Access-Control-Allow-Origin" = true }
+}
 resource "aws_api_gateway_integration" "item_integration_del" {
   rest_api_id             = aws_api_gateway_rest_api.simple_apigw.id
   resource_id             = aws_api_gateway_resource.bucket_item_resource.id
@@ -84,7 +94,18 @@ resource "aws_api_gateway_integration" "item_integration_del" {
   credentials             = aws_iam_role.simple_apigw_role.arn
   uri                     = "arn:aws:apigateway:us-east-1:s3:path/${aws_s3_bucket.simple_apigw_s3.bucket}/{item}"
   request_parameters = {
-      "integration.request.path.item" = "method.request.path.item"
-   }
+    "integration.request.path.item" = "method.request.path.item"
+  }
+}
+
+resource "aws_api_gateway_integration_response" "item_Integration400_del" {
+  rest_api_id = aws_api_gateway_rest_api.simple_apigw.id
+  resource_id = aws_api_gateway_resource.bucket_item_resource.id
+  http_method = aws_api_gateway_method.item_method_del.http_method
+  status_code = aws_api_gateway_method_response.item_response_200_del.status_code
+  response_templates = {
+    "application/json" = var.integration_sucess_delete
+  }
+  #response_parameters = { "method.response.header.Access-Control-Allow-Origin" = "'*'" }
 }
 

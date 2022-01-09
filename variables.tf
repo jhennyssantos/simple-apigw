@@ -7,10 +7,18 @@ variable "request_model" {
   default = "Empty"
 }
 
-variable "integration_error_template" {
+variable "integration_sucess_template" {
   default = <<EOF
-#set ($errorMessageObj = $util.parseJson($input.path('$.errorMessage')) {
-  "message" : "$errorMessageObj.message"
+{
+  "message" : "Arquivo enviado com sucesso!"
+}
+EOF
+}
+
+variable "integration_sucess_delete" {
+  default = <<EOF
+{
+  "message" : "Arquivo DELETADO com sucesso!"
 }
 EOF
 }
